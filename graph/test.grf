@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Graph author="Lukas" created="Mon Jun 13 13:18:47 CEST 2016" guiVersion="4.2.0" id="1465832829312" licenseCode="CLP1DJAVLI36399945BY" name="reader" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="OutMeta" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\r\n" type="delimited">
+<Field name="offset" type="string"/>
+<Field name="content" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata1">
+<Record fieldDelimiter="|" name="recordName1" recordDelimiter="\r\n" type="delimited">
+<Field name="content" type="string"/>
+</Record>
+</Metadata>
+<GraphParameters>
+<GraphParameterFile fileURL="workspace.prm"/>
+</GraphParameters>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node guiName="DataGenerator" guiX="197" guiY="262" id="DATA_GENERATOR" type="DATA_GENERATOR">
+<attr name="generate"><![CDATA[//#CTL2
+
+// Generates output record.
+function integer generate() {
+	$out.0.content = "writing from CloverETL";
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the generate. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if generate() throws an exception.
+// function integer generateOnError(string errorMessage, string stackTrace) {
+// }
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Node guiName="KafkaWriter" guiX="487" guiY="262" id="KAFKA_WRITER" jobURL="${SUBGRAPH_DIR}/KafkaWriter.sgrf" type="SUBGRAPH"/>
+<Edge fromNode="DATA_GENERATOR:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="KAFKA_WRITER:0"/>
+</Phase>
+</Graph>

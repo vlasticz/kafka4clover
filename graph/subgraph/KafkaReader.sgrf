@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Graph author="Lukas" created="Tue Jun 14 12:51:31 CEST 2016" guiVersion="4.2.0" id="1465901698854" licenseCode="CLP1DJAVLI36399945BY" name="KafKaReader" nature="subgraph" showComponentDetails="true">
+<Global>
+<outputPorts>
+<singlePort connected="false" name="0"/>
+</outputPorts>
+<Metadata id="Metadata0">
+<Record fieldDelimiter="|" name="debugInput1" recordDelimiter="\r\n" type="delimited">
+<Field name="field1" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="OutMeta" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\r\n" type="delimited">
+<Field name="offset" type="string"/>
+<Field name="content" type="string"/>
+</Record>
+</Metadata>
+<GraphParameters>
+<GraphParameterFile fileURL="workspace.prm"/>
+</GraphParameters>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node genericTransformClass="com.cloveretl.custom.KafkaReader" guiName="CustomJavaReader" guiX="341" guiY="100" id="CUSTOM_JAVA_READER" type="GENERIC_READER"/>
+<Node guiName="SubgraphInput" guiX="200" guiY="10" id="SUBGRAPH_INPUT0" type="SUBGRAPH_INPUT">
+<Port guiY="117" name="0"/>
+</Node>
+<Node guiName="SubgraphOutput" guiX="800" guiY="10" id="SUBGRAPH_OUTPUT0" type="SUBGRAPH_OUTPUT">
+<Port guiY="117" name="0"/>
+<Port guiY="187" name="1"/>
+</Node>
+<Edge debugMode="true" fromNode="CUSTOM_JAVA_READER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge3" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="SUBGRAPH_OUTPUT0:0"/>
+</Phase>
+</Graph>

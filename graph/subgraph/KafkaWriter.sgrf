@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Graph author="Lukas" created="Wed Jun 15 12:29:20 CEST 2016" guiVersion="4.2.0" id="1465997480215" licenseCode="CLP1DJAVLI36399945BY" name="KafkaWriter" nature="subgraph" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata0">
+<Record fieldDelimiter="|" name="debugInput1" recordDelimiter="\r\n" type="delimited">
+<Field name="field1" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="msg" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\r\n" type="delimited">
+<Field name="content" type="string"/>
+</Record>
+</Metadata>
+<GraphParameters>
+<GraphParameterFile fileURL="workspace.prm"/>
+</GraphParameters>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node guiName="SubgraphInput" guiX="200" guiY="10" id="SUBGRAPH_INPUT0" type="SUBGRAPH_INPUT">
+<Port guiY="117" name="0"/>
+</Node>
+</Phase>
+<Phase number="1">
+<Node genericTransformClass="com.cloveretl.custom.KafkaWriter" guiName="CustomJavaWriter" guiX="408" guiY="109" id="CUSTOM_JAVA_WRITER" type="GENERIC_WRITER"/>
+<Node guiName="SubgraphOutput" guiX="800" guiY="10" id="SUBGRAPH_OUTPUT0" type="SUBGRAPH_OUTPUT">
+<Port guiY="117" name="0"/>
+</Node>
+</Phase>
+</Graph>
