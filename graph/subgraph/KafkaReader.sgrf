@@ -4,24 +4,30 @@
 <outputPorts>
 <singlePort connected="false" name="0"/>
 </outputPorts>
-<Metadata id="Metadata0">
-<Record fieldDelimiter="|" name="debugInput1" recordDelimiter="\r\n" type="delimited">
-<Field name="field1" type="string"/>
-</Record>
-</Metadata>
 <Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="|" name="OutMeta" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\r\n" type="delimited">
+<Record fieldDelimiter="|" name="Kafka_Messages" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\r\n" type="delimited">
 <Field name="offset" type="string"/>
 <Field name="content" type="string"/>
 </Record>
 </Metadata>
 <GraphParameters>
+<GraphParameter label="Broker Host" name="HOST" public="true" required="true"/>
+<GraphParameter defaultHint="9092" label="Broker Port" name="PORT" public="true" required="false" value="9092"/>
+<GraphParameter category="basic" label="Topic" name="TOPIC" public="true" required="true"/>
+<GraphParameter category="advanced" defaultHint="Autobalance" label="Partition" name="PARTITION" public="true"/>
+<GraphParameter defaultHint="0" label="Offset" name="OFFSET" public="true" value="0"/>
 <GraphParameterFile fileURL="workspace.prm"/>
 </GraphParameters>
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node genericTransformClass="com.cloveretl.custom.KafkaReader" guiName="CustomJavaReader" guiX="341" guiY="100" id="CUSTOM_JAVA_READER" type="GENERIC_READER"/>
+<Node genericTransformClass="com.cloveretl.custom.KafkaReader" guiName="CustomJavaReader" guiX="341" guiY="100" id="CUSTOM_JAVA_READER" type="GENERIC_READER">
+<attr name="port"><![CDATA[${PORT}]]></attr>
+<attr name="topic"><![CDATA[${TOPIC}]]></attr>
+<attr name="partition"><![CDATA[${PARTITION}]]></attr>
+<attr name="host"><![CDATA[${HOST}]]></attr>
+<attr name="offset"><![CDATA[${OFFSET}]]></attr>
+</Node>
 <Node guiName="SubgraphInput" guiX="200" guiY="10" id="SUBGRAPH_INPUT0" type="SUBGRAPH_INPUT">
 <Port guiY="117" name="0"/>
 </Node>

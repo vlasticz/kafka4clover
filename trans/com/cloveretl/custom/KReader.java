@@ -16,6 +16,7 @@ import org.apache.kafka.common.TopicPartition;
 public class KReader {
 		
 	private KafkaConsumer<String, String> consumer;
+	private boolean quit = false;
 	
 	public static void main(String[] args) {
 		
@@ -42,23 +43,36 @@ public class KReader {
 	
 	
 	private void exec() {
+		ConsumerRecord<String, String> lastRecord = null, currentRecord = null;
+		
 		System.out.println("Consumer started");
+			
+		consumer.subscribe(Arrays.asList("test"));
+		consumer.poll(0);
 		
-		TopicPartition partition0 = new TopicPartition("test", 0);
-	
-		consumer.subscribe(Arrays.asList("test"));		
+		for (TopicPartition partition: consumer.assignment())
+		    consumer.seek(partition, 0L);
 				
-		System.out.println(consumer.partitionsFor("test"));
-		
-		//consumer.assign(Arrays.asList(partition0));
-		//consumer.seekToBeginning(Arrays.asList(partition0));
-				
-	    while (true) {
-	        ConsumerRecords<String, String> records = consumer.poll(50);
-	        for (ConsumerRecord<String, String> record : records) {
-	            System.out.printf("offset = %d, key = %s, value = %s\n", record.offset(), record.key(), record.value());	          
+			
+	    while (!quit) {
+	        ConsumerRecords<String, String> records = consumer.poll(100);
+	        
+	        for (ConsumerRecord<String, String> record : records) {	        	
+	            System.out.printf("offset = %d, key = %s, value = %s\n", record.offset(), record.key(), record.value());
+	            	            	            
+	            currentRecord = record;
 	        }
-	        consumer.commitSync();
-	    }	    	    
+	        
+	        if(lastRecord != null) {
+            	
+	            if(lastRecord.offset() == currentRecord.offset()) {
+	            	System.out.println("Quitting ...");
+	            	consumer.close();
+	            	quit = true;
+	            }
+            }
+	        
+	        lastRecord = currentRecord;
+	    }
 	}
 }
