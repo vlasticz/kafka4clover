@@ -1,30 +1,141 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Graph author="Lukas" created="Wed Jun 15 12:29:20 CEST 2016" guiVersion="4.2.0" id="1465997480215" licenseCode="CLP1DJAVLI36399945BY" name="KafkaWriter" nature="subgraph" showComponentDetails="true">
+<Graph author="user" category="writers" created="Wed Mar 18 14:56:25 CET 2015" guiVersion="4.2.0" id="1426688083699" licenseCode="Commercial Devel" licenseType="Commercial" modified="Thu Apr 23 16:30:13 CEST 2015" modifiedBy="user" name="kafkaWriter" nature="subgraph" revision="1.119" showComponentDetails="true">
 <Global>
-<Metadata id="Metadata0">
-<Record fieldDelimiter="|" name="debugInput1" recordDelimiter="\r\n" type="delimited">
+<inputPorts>
+<singlePort connected="true" name="0" required="true"/>
+</inputPorts>
+<outputPorts>
+<singlePort connected="true" keepEdge="false" name="0" required="false"/>
+</outputPorts>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="bytes" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\r\n" type="delimited">
+<Field delimiter=" " name="content" type="byte"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata2" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="dummyInput" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\r\n" type="delimited">
 <Field name="field1" type="string"/>
 </Record>
 </Metadata>
-<Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="|" name="msg" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\r\n" type="delimited">
-<Field name="content" type="string"/>
-</Record>
-</Metadata>
 <GraphParameters>
+<GraphParameter label="Broker host" name="HOST" public="true" required="true">
+<SingleType name="string"/>
+</GraphParameter>
+<GraphParameter label="Broker port" name="PORT" public="true" required="false">
+<SingleType name="int"/>
+</GraphParameter>
+<GraphParameter category="advanced" label="Log charset" name="LOG_CHARSET" public="true" required="false" value="UTF-8">
+<ComponentReference referencedComponent="UNIVERSAL_DATA_WRITER" referencedProperty="charset"/>
+</GraphParameter>
+<GraphParameter label="Topic" name="TOPIC" public="true" required="true">
+<ComponentReference referencedComponent="KAFKA_WRITER1" referencedProperty="topic"/>
+</GraphParameter>
+<GraphParameter category="advanced" label="Max error count" name="MAX_REJECTED" public="true" required="false" value="0">
+<SingleType name="int"/>
+</GraphParameter>
 <GraphParameterFile fileURL="workspace.prm"/>
 </GraphParameters>
-<Dictionary/>
+<Dictionary>
+<Entry dictval.value="false" input="false" name="fail" output="false" type="boolean"/>
+</Dictionary>
 </Global>
 <Phase number="0">
-<Node guiName="SubgraphInput" guiX="200" guiY="10" id="SUBGRAPH_INPUT0" type="SUBGRAPH_INPUT">
-<Port guiY="117" name="0"/>
+<Node debugInput="true" guiName="DataGenerator" guiX="16" guiY="121" id="DATA_GENERATOR1" type="DATA_GENERATOR"/>
+<Node enabled="enabled" genericTransformClass="com.cloveretl.kafka.KafkaWriter" guiName="KafkaByteWriter" guiX="497" guiY="104" id="KAFKA_BYTE_WRITER" type="GENERIC_WRITER">
+<attr name="port"><![CDATA[${PORT}]]></attr>
+<attr name="topic"><![CDATA[${TOPIC}]]></attr>
+<attr name="maxRejected"><![CDATA[${MAX_REJECTED}]]></attr>
+<attr name="host"><![CDATA[${HOST}]]></attr>
 </Node>
+<Node enabled="enabled" guiName="SubgraphInput" guiX="200" guiY="10" id="SUBGRAPH_INPUT0" type="SUBGRAPH_INPUT">
+<Port guiY="114" name="0"/>
+<Port guiY="248" name="1"/>
+</Node>
+<Node enabled="enableWhenOutputPort0IsConnected" fileURL="port:$0.content:discrete" guiName="UniversalDataReader" guiX="694" guiY="104" id="UNIVERSAL_DATA_READER" type="DATA_READER"/>
+<Node charset="${LOG_CHARSET}" enabled="enabled" fileURL="port:$0.content:discrete" guiName="UniversalDataWriter" guiX="294" guiY="99" id="UNIVERSAL_DATA_WRITER" recordsPerFile="1" type="DATA_WRITER"/>
+<Edge fromNode="DATA_GENERATOR1:0" guiBendpoints="" guiRouter="Manhattan" id="Edge4" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (out)" toNode="SUBGRAPH_INPUT0:0"/>
+<Edge debugMode="true" fromNode="KAFKA_BYTE_WRITER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge2" inPort="Port 0 (input)" metadata="Metadata0" outPort="Port 0 (out)" toNode="UNIVERSAL_DATA_READER:0"/>
+<Edge debugMode="true" fromNode="SUBGRAPH_INPUT0:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" outPort="Port 0 (out)" persistedImplicitMetadata="Metadata2" toNode="UNIVERSAL_DATA_WRITER:0"/>
+<Edge debugMode="true" fromNode="UNIVERSAL_DATA_READER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge3" inPort="Port 0 (in)" metadataRef="#//Edge0" outPort="Port 0 (output)" persistedImplicitMetadata="Metadata2" toNode="SUBGRAPH_OUTPUT0:0"/>
+<Edge debugMode="true" fromNode="UNIVERSAL_DATA_WRITER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="KAFKA_BYTE_WRITER:0"/>
 </Phase>
 <Phase number="1">
-<Node genericTransformClass="com.cloveretl.custom.KafkaWriter" guiName="CustomJavaWriter" guiX="408" guiY="109" id="CUSTOM_JAVA_WRITER" type="GENERIC_WRITER"/>
-<Node guiName="SubgraphOutput" guiX="800" guiY="10" id="SUBGRAPH_OUTPUT0" type="SUBGRAPH_OUTPUT">
-<Port guiY="117" name="0"/>
+<Node guiName="Fail" guiX="612" guiY="260" id="FAIL" type="FAIL">
+<attr name="mapping"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	integer rejected = str2integer(getParamValue("MAX_REJECTED")) + 1;
+	string errorMessage = "Maximum number of rejected records exceeded. ";
+	if (rejected == 1) {
+		errorMessage += "1 record was rejected.";
+	} else {
+		errorMessage += num2str(rejected) + " records were rejected.";
+	}
+	$out.0.errorMessage = errorMessage;
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
 </Node>
+<Node guiName="Send record if drictionary.fail" guiX="322" guiY="260" id="SEND_RECORD_IF_DRICTIONARY_FAIL" type="DATA_GENERATOR">
+<attr name="generate"><![CDATA[//#CTL2
+
+// Generates output record.
+function integer generate() {
+	if (dictionary.fail) {
+		return ALL;
+	} else {
+		return SKIP;
+	}
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the generate. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if generate() throws an exception.
+// function integer generateOnError(string errorMessage, string stackTrace) {
+// }
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Node enabled="enabled" guiName="SubgraphOutput" guiX="949" guiY="10" id="SUBGRAPH_OUTPUT0" type="SUBGRAPH_OUTPUT">
+<Port guiY="117" name="0"/>
+<Port guiY="187" name="1"/>
+</Node>
+<Edge fromNode="SEND_RECORD_IF_DRICTIONARY_FAIL:0" guiBendpoints="" guiRouter="Manhattan" id="Edge8" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (out)" toNode="FAIL:0"/>
+<Edge fromNode="SUBGRAPH_OUTPUT0:0" guiBendpoints="" guiRouter="Manhattan" id="Edge5" inPort="Port 0 (in)" outPort="Port 0 (out)" persistedImplicitMetadata="Metadata2" toNode="TRASH:0"/>
+</Phase>
+<Phase number="2">
+<Node debugOutput="true" guiName="Trash" guiX="1042" guiY="157" id="TRASH" type="TRASH"/>
 </Phase>
 </Graph>

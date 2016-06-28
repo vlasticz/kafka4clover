@@ -1,4 +1,4 @@
-package com.cloveretl.custom;
+package com.cloveretl.kafka;
 
 import java.util.Properties;
 

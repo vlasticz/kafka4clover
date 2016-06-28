@@ -1,4 +1,4 @@
-package com.cloveretl.custom;
+package com.cloveretl.kafka;
 
 import java.util.Arrays;
 import java.util.Properties;
