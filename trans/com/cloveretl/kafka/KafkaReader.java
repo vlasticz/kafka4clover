@@ -25,38 +25,25 @@ import org.jetel.metadata.DataRecordMetadata;
  */
 public class KafkaReader extends AbstractGenericTransform {
 		
+	// Consumer attributes.
 	private final static String STRING_DESERIALIZER = "org.apache.kafka.common.serialization.StringDeserializer";
 	private final static String SESSION_TIMEOUT = "30000";
 	private final static String AUTO_COMMIT_INTERVAL = "1000";
+	
+	// Expected output metadata fields.
 	private final static String OFFSET_METADATA_FIELD = "offset";
 	private final static String CONTENT_METADATA_FIELD = "content";
 	
-	private String topic;
 	private boolean quit = false;
 	
 	private KafkaConsumer<String, String> consumer;
 	
 	@Override
 	public void execute() {
-				
-		Integer partitionNum = getProperties().getIntProperty("partition");
-		ConsumerRecord<String, String> lastRecord = null, 
-				   					   currentRecord = null;		
-	
-		if(partitionNum != null) {
-			TopicPartition partition = new TopicPartition(topic, partitionNum);
-			consumer.assign(Arrays.asList(partition));
-			consumer.poll(0);
-			consumer.seek(partition, getProperties().getIntProperty("offset"));
-			
-		} else {			
-			consumer.subscribe(Arrays.asList(topic));
-			consumer.poll(0);		
-			for (TopicPartition partition: consumer.assignment())
-				consumer.seek(partition, getProperties().getIntProperty("offset"));
-		}
-	
+		
 		DataRecord cloverRecord = outRecords[0];
+		ConsumerRecord<String, String> lastRecord = null, 
+				   					   currentRecord = null;
 
 		while(!quit && getComponent().runIt()) {
 
@@ -114,12 +101,14 @@ public class KafkaReader extends AbstractGenericTransform {
 	@Override
 	public void preExecute() throws ComponentNotReadyException {
 		
+		// This classloader change is needed until the CloverETL 4.3.x is out.
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		
 		try {
 			Thread.currentThread().setContextClassLoader(null);
 			
-			topic = getProperties().getStringProperty("topic");
+			Integer partitionNum = getProperties().getIntProperty("partition");
+			String topic = getProperties().getStringProperty("topic");
 												
 			Properties props = new Properties();
 			
@@ -133,6 +122,20 @@ public class KafkaReader extends AbstractGenericTransform {
 		    
 		    consumer = new KafkaConsumer<>(props);
 		    
+		    // If a partition number is set then is used, otherwise it is assigned by the Kafka server. 
+		    if(partitionNum != null) {
+				TopicPartition partition = new TopicPartition(topic, partitionNum);
+				consumer.assign(Arrays.asList(partition));
+				consumer.poll(0);
+				consumer.seek(partition, getProperties().getIntProperty("offset"));
+				
+			} else {			
+				consumer.subscribe(Arrays.asList(topic));
+				consumer.poll(0);		
+				for (TopicPartition partition: consumer.assignment())
+					consumer.seek(partition, getProperties().getIntProperty("offset"));
+			}
+		    
 		} finally {
 			Thread.currentThread().setContextClassLoader(cl);
 		}
@@ -141,16 +144,6 @@ public class KafkaReader extends AbstractGenericTransform {
 
 	@Override
 	public void postExecute() throws ComponentNotReadyException {
-		super.postExecute();
-		
-		/*
-		ClassLoader cl = Thread.currentThread().getContextClassLoader();
-		
-		try {
-			Thread.currentThread().setContextClassLoader(null);
-			consumer.close();
-		} finally {
-			Thread.currentThread().setContextClassLoader(cl);
-		}*/
+		super.postExecute();		
 	}
 }

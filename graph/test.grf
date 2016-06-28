@@ -48,7 +48,7 @@ function integer generate() {
 // function string getMessage() {}
 ]]></attr>
 </Node>
-<Node __HOST="localhost" __TOPIC="testr" guiName="KafkaReader" guiX="242" guiY="264" id="KAFKA_READER" jobURL="${SUBGRAPH_DIR}/KafkaReader.sgrf" type="SUBGRAPH"/>
+<Node __HOST="localhost" __TOPIC="new" guiName="KafkaReader" guiX="242" guiY="264" id="KAFKA_READER" jobURL="${SUBGRAPH_DIR}/KafkaReader.sgrf" type="SUBGRAPH"/>
 <Node __HOST="localhost" __PORT="9092" __TOPIC="testr" enabled="disabled" guiName="KafkaWriter" guiX="519" guiY="428" id="KAFKA_WRITER" jobURL="${SUBGRAPH_DIR}/KafkaWriter.sgrf" type="SUBGRAPH"/>
 <Node guiName="Trash" guiX="525" guiY="273" id="TRASH" type="TRASH"/>
 <Edge fromNode="DATA_GENERATOR:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="KAFKA_WRITER:0"/>
