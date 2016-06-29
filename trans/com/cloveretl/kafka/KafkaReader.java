@@ -1,5 +1,6 @@
 package com.cloveretl.kafka;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.Properties;
 
@@ -13,6 +14,7 @@ import org.jetel.exception.ComponentNotReadyException;
 import org.jetel.exception.ConfigurationStatus;
 import org.jetel.exception.ConfigurationStatus.Priority;
 import org.jetel.exception.ConfigurationStatus.Severity;
+import org.jetel.exception.JetelRuntimeException;
 import org.jetel.metadata.DataRecordMetadata;
 
 /**
@@ -25,10 +27,11 @@ import org.jetel.metadata.DataRecordMetadata;
  */
 public class KafkaReader extends AbstractGenericTransform {
 		
-	// Consumer attributes.
-	private final static String STRING_DESERIALIZER = "org.apache.kafka.common.serialization.StringDeserializer";
+	// Consumer attributes. Default values, might need to be changed.
+	private final static String STRING_DESERIALIZER = "org.apache.kafka.common.serialization.ByteArrayDeserializer";
 	private final static String SESSION_TIMEOUT = "30000";
 	private final static String AUTO_COMMIT_INTERVAL = "1000";
+	private final static int POLL_INTERVAL = 100;
 	
 	// Expected output metadata fields.
 	private final static String OFFSET_METADATA_FIELD = "offset";
@@ -36,38 +39,43 @@ public class KafkaReader extends AbstractGenericTransform {
 	
 	private boolean quit = false;
 	
-	private KafkaConsumer<String, String> consumer;
+	private KafkaConsumer<String, byte[]> consumer;
 	
 	@Override
-	public void execute() {
+	public void execute() throws UnsupportedEncodingException {
 		
-		DataRecord cloverRecord = outRecords[0];
-		ConsumerRecord<String, String> lastRecord = null, 
-				   					   currentRecord = null;
-
-		while(!quit && getComponent().runIt()) {
-
-			ConsumerRecords<String, String> records = consumer.poll(100);
-
-			for(ConsumerRecord<String, String> kafkaRecord : records) {			
-				cloverRecord.getField(OFFSET_METADATA_FIELD).setValue(String.valueOf(kafkaRecord.offset()));
-				cloverRecord.getField(CONTENT_METADATA_FIELD).setValue(kafkaRecord.value());
-				writeRecordToPort(0, cloverRecord);
-
-				currentRecord = kafkaRecord;
-			}
-
-			if(lastRecord != null) {
-
-				if(lastRecord.offset() == currentRecord.offset()) {	            	
-					quit = true;
+		try{
+			DataRecord cloverRecord = outRecords[0];
+			ConsumerRecord<String, byte[]> lastRecord = null, 
+					   					   currentRecord = null;
+	
+			while(!quit && getComponent().runIt()) {
+	
+				ConsumerRecords<String, byte[]> records = consumer.poll(POLL_INTERVAL);
+	
+				for(ConsumerRecord<String, byte[]> kafkaRecord : records) {
+					cloverRecord.getField(OFFSET_METADATA_FIELD).setValue(String.valueOf(kafkaRecord.offset()));				
+					cloverRecord.getField(CONTENT_METADATA_FIELD).setValue(new String(kafkaRecord.value(), getProperties().getStringProperty("logCharset")));
+					writeRecordToPort(0, cloverRecord);
+	
+					currentRecord = kafkaRecord;
 				}
+	
+				if(lastRecord != null) {
+					// If the last record's offset is the same as the current one we're at the end of the stream - quit.
+					if(lastRecord.offset() == currentRecord.offset()) {	            	
+						quit = true;
+					}
+				}
+	
+				lastRecord = currentRecord;
 			}
-
-			lastRecord = currentRecord;
+			
+			consumer.close();
+			
+		} catch(Exception e) {
+			throw new JetelRuntimeException(e);
 		}
-
-		consumer.close();
 	}
 		
 	@Override
@@ -112,13 +120,13 @@ public class KafkaReader extends AbstractGenericTransform {
 												
 			Properties props = new Properties();
 			
-			props.put("bootstrap.servers", String.join(":", getProperties().getStringProperty("host"), getProperties().getStringProperty("port")));			
-		    props.put("group.id", topic);
-		    props.put("enable.auto.commit", "true");
-		    props.put("auto.commit.interval.ms", AUTO_COMMIT_INTERVAL);
-		    props.put("session.timeout.ms", SESSION_TIMEOUT);		    
+			props.put("bootstrap.servers", String.join(":", getProperties().getStringProperty("host"), getProperties().getStringProperty("port")));
+			props.put("group.id", topic);
+			props.put("enable.auto.commit", "true");
+			props.put("auto.commit.interval.ms", AUTO_COMMIT_INTERVAL);
+			props.put("session.timeout.ms", SESSION_TIMEOUT);	
 		    props.put("key.deserializer", STRING_DESERIALIZER);
-		    props.put("value.deserializer", STRING_DESERIALIZER);	    
+		    props.put("value.deserializer", STRING_DESERIALIZER);
 		    
 		    consumer = new KafkaConsumer<>(props);
 		    
@@ -138,8 +146,7 @@ public class KafkaReader extends AbstractGenericTransform {
 		    
 		} finally {
 			Thread.currentThread().setContextClassLoader(cl);
-		}
-	    
+		}	    
 	}
 
 	@Override

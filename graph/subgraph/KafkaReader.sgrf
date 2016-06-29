@@ -16,12 +16,20 @@
 <GraphParameter category="basic" label="Topic" name="TOPIC" public="true" required="true"/>
 <GraphParameter category="advanced" defaultHint="Autobalance" label="Partition" name="PARTITION" public="true"/>
 <GraphParameter defaultHint="0" label="Offset" name="OFFSET" public="true" value="0"/>
+<GraphParameter category="advanced" label="Log Charset" name="CHARSET" public="true" value="UTF-8"/>
 <GraphParameterFile fileURL="workspace.prm"/>
 </GraphParameters>
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node genericTransformClass="com.cloveretl.kafka.KafkaReader" guiName="CustomJavaReader" guiX="341" guiY="100" host="${HOST}" id="CUSTOM_JAVA_READER" offset="${OFFSET}" partition="${PARTITION}" port="${PORT}" topic="${TOPIC}" type="GENERIC_READER"/>
+<Node genericTransformClass="com.cloveretl.kafka.KafkaReader" guiName="CustomJavaReader" guiX="418" guiY="100" id="CUSTOM_JAVA_READER" type="GENERIC_READER">
+<attr name="port"><![CDATA[${PORT}]]></attr>
+<attr name="logCharset"><![CDATA[${CHARSET}]]></attr>
+<attr name="topic"><![CDATA[${TOPIC}]]></attr>
+<attr name="partition"><![CDATA[${PARTITION}]]></attr>
+<attr name="host"><![CDATA[${HOST}]]></attr>
+<attr name="offset"><![CDATA[${OFFSET}]]></attr>
+</Node>
 <Node guiName="SubgraphInput" guiX="200" guiY="10" id="SUBGRAPH_INPUT0" type="SUBGRAPH_INPUT">
 <Port guiY="117" name="0"/>
 </Node>
