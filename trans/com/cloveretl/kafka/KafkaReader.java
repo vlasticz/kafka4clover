@@ -49,6 +49,8 @@ public class KafkaReader extends AbstractGenericTransform {
 			ConsumerRecord<String, byte[]> lastRecord = null, 
 					   					   currentRecord = null;
 	
+			long start = System.currentTimeMillis();
+			
 			while(!quit && getComponent().runIt()) {
 	
 				ConsumerRecords<String, byte[]> records = consumer.poll(POLL_INTERVAL);
@@ -63,18 +65,22 @@ public class KafkaReader extends AbstractGenericTransform {
 	
 				if(lastRecord != null) {
 					// If the last record's offset is the same as the current one we're at the end of the stream - quit.
-					if(lastRecord.offset() == currentRecord.offset()) {	            	
+					if(lastRecord.offset() == currentRecord.offset())	            	
 						quit = true;
-					}
+				} else {
+					// If is null and the read timeout is reached - quit.
+					if(System.currentTimeMillis() - start > getProperties().getLongProperty("readTimeout"))
+						quit = true;
 				}
 	
-				lastRecord = currentRecord;
-			}
-			
-			consumer.close();
+				lastRecord = currentRecord;			
+			}			
 			
 		} catch(Exception e) {
 			throw new JetelRuntimeException(e);
+			
+		} finally {
+			consumer.close();
 		}
 	}
 		
@@ -109,12 +115,13 @@ public class KafkaReader extends AbstractGenericTransform {
 	@Override
 	public void preExecute() throws ComponentNotReadyException {
 		
-		// This classloader change is needed until the CloverETL 4.3.x is out.
+		// This classloader change is needed until the CloverETL 4.2.1 is out.
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		
 		try {
 			Thread.currentThread().setContextClassLoader(null);
 			
+			// Create consumer config.
 			Integer partitionNum = getProperties().getIntProperty("partition");
 			String topic = getProperties().getStringProperty("topic");
 												
@@ -130,7 +137,7 @@ public class KafkaReader extends AbstractGenericTransform {
 		    
 		    consumer = new KafkaConsumer<>(props);
 		    
-		    // If a partition number is set then is used, otherwise it is assigned by the Kafka server. 
+		    // If a partition number is set, it is used. Otherwise it is assigned by the Kafka server. 
 		    if(partitionNum != null) {
 				TopicPartition partition = new TopicPartition(topic, partitionNum);
 				consumer.assign(Arrays.asList(partition));

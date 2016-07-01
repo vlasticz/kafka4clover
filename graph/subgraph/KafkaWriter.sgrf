@@ -18,19 +18,19 @@
 </Record>
 </Metadata>
 <GraphParameters>
-<GraphParameter label="Broker host" name="HOST" public="true" required="true">
+<GraphParameter label="Broker Host" name="HOST" public="true" required="true">
 <SingleType name="string"/>
 </GraphParameter>
-<GraphParameter label="Broker port" name="PORT" public="true" required="false">
+<GraphParameter label="Broker Port" name="PORT" public="true" required="false">
 <SingleType name="int"/>
 </GraphParameter>
-<GraphParameter category="advanced" label="Log charset" name="LOG_CHARSET" public="true" required="false" value="UTF-8">
+<GraphParameter category="advanced" label="Log Charset" name="LOG_CHARSET" public="true" required="false" value="UTF-8">
 <ComponentReference referencedComponent="UNIVERSAL_DATA_WRITER" referencedProperty="charset"/>
 </GraphParameter>
 <GraphParameter label="Topic" name="TOPIC" public="true" required="true">
 <ComponentReference referencedComponent="KAFKA_WRITER1" referencedProperty="topic"/>
 </GraphParameter>
-<GraphParameter category="advanced" label="Max error count" name="MAX_REJECTED" public="true" required="false" value="0">
+<GraphParameter category="advanced" label="Max Error Count" name="MAX_REJECTED" public="true" required="false" value="0">
 <SingleType name="int"/>
 </GraphParameter>
 <GraphParameterFile fileURL="workspace.prm"/>

@@ -17,19 +17,13 @@
 <GraphParameter category="advanced" defaultHint="Autobalance" label="Partition" name="PARTITION" public="true"/>
 <GraphParameter defaultHint="0" label="Offset" name="OFFSET" public="true" value="0"/>
 <GraphParameter category="advanced" label="Log Charset" name="CHARSET" public="true" value="UTF-8"/>
+<GraphParameter category="advanced" label="Read Timeout (ms)" name="READ_TIMEOUT" public="true" required="false" value="10000"/>
 <GraphParameterFile fileURL="workspace.prm"/>
 </GraphParameters>
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node genericTransformClass="com.cloveretl.kafka.KafkaReader" guiName="CustomJavaReader" guiX="418" guiY="100" id="CUSTOM_JAVA_READER" type="GENERIC_READER">
-<attr name="port"><![CDATA[${PORT}]]></attr>
-<attr name="logCharset"><![CDATA[${CHARSET}]]></attr>
-<attr name="topic"><![CDATA[${TOPIC}]]></attr>
-<attr name="partition"><![CDATA[${PARTITION}]]></attr>
-<attr name="host"><![CDATA[${HOST}]]></attr>
-<attr name="offset"><![CDATA[${OFFSET}]]></attr>
-</Node>
+<Node genericTransformClass="com.cloveretl.kafka.KafkaReader" guiName="CustomJavaReader" guiX="418" guiY="100" host="${HOST}" id="CUSTOM_JAVA_READER" logCharset="${CHARSET}" offset="${OFFSET}" partition="${PARTITION}" port="${PORT}" readTimeout="${READ_TIMEOUT}" topic="${TOPIC}" type="GENERIC_READER"/>
 <Node guiName="SubgraphInput" guiX="200" guiY="10" id="SUBGRAPH_INPUT0" type="SUBGRAPH_INPUT">
 <Port guiY="117" name="0"/>
 </Node>

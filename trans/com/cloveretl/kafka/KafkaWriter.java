@@ -173,13 +173,14 @@ public class KafkaWriter extends AbstractGenericTransform {
 			maxRejects = getProperties().getLongProperty(MAX_REJECTED_ATTR, 0);
 		}
 		allowedRejectsLeft = maxRejects;
-		
-		// create producer config
+				
+		// This classloader change is needed until the CloverETL 4.2.1 is out.
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		
 		try {
 			Thread.currentThread().setContextClassLoader(null);
 			
+			// create producer config
 			Properties kafkaProducerConfig = new Properties();
 			String brokerList;
 			if (StringUtils.isEmpty(port)) {
